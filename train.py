@@ -8,11 +8,12 @@ from stack_lstm import (
     input_symbol_to_index, output_symbol_to_index, output_index_to_symbol)
 from util import transpose, argmax
 
+
 def random_sequence(length, alphabet_size):
     return Sequence([3 + random.randrange(alphabet_size) for i in range(length)])
 
-class Sequence:
 
+class Sequence:
     def __init__(self, source_sequence):
         self.source_sequence = source_sequence
 
@@ -30,9 +31,11 @@ class Sequence:
     def output_sequence_length(self):
         return len(self.source_sequence) + 1
 
+
 def parse_range(arg):
     lo, hi = arg.split(',')
     return int(lo), int(hi)
+
 
 def train(args, builder, params):
     trainer = dynet.RMSPropTrainer(params, args.learning_rate)
@@ -77,6 +80,7 @@ def train(args, builder, params):
         avg_loss = batch_group_loss / (args.batch_size * args.batch_group_size)
         print('  average loss: %0.2f' % avg_loss)
 
+
 def test(args, builder):
     print('testing...')
     total_fine_correct = 0.0
@@ -112,37 +116,37 @@ def test(args, builder):
     print('fine accuracy:   %0.2f' % fine_accuracy)
     print('coarse accuracy: %0.2f' % coarse_accuracy)
 
-def main():
 
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--hidden-units', type=int, default=256,
-        help='Number of hidden units to use in the LSTM controller.')
+                        help='Number of hidden units to use in the LSTM controller.')
     parser.add_argument('--learning-rate', type=float, default=0.001,
-        help='Initial learning rate for RMSProp.')
+                        help='Initial learning rate for RMSProp.')
     parser.add_argument('--iterations', type=int, default=20,
-        help='Number of iterations of training to run. By default, each iteration is equivalent to 1000 training examples.')
+                        help='Number of iterations of training to run. By default, each iteration is equivalent to 1000 training examples.')
     parser.add_argument('--source-alphabet-size', type=int, default=128,
-        help='Number of symbols to use in the source sequence.')
+                        help='Number of symbols to use in the source sequence.')
     parser.add_argument('--embedding-size', type=int, default=64,
-        help='Input embedding size.')
+                        help='Input embedding size.')
     parser.add_argument('--stack-embedding-size', type=int, default=256,
-        help='Size of vector values stored on the neural stack.')
+                        help='Size of vector values stored on the neural stack.')
     parser.add_argument('--clip-threshold', type=float, default=1.0,
-        help='Gradient clipping threshold.')
+                        help='Gradient clipping threshold.')
     parser.add_argument('--batch-size', type=int, default=10,
-        help='Batch size.')
+                        help='Batch size.')
     parser.add_argument('--batch-group-size', type=int, default=100,
-        help='Number of batches per iteration.')
+                        help='Number of batches per iteration.')
     parser.add_argument('--training-length-range', type=parse_range, default=(8, 64),
-        help='Range of lengths of source sequences during training.',
-        metavar='MIN,MAX')
+                        help='Range of lengths of source sequences during training.',
+                        metavar='MIN,MAX')
     parser.add_argument('--test-length-range', type=parse_range, default=(65, 128),
-        help='Range of lengths of source sequences during testing.',
-        metavar='MIN,MAX')
+                        help='Range of lengths of source sequences during testing.',
+                        metavar='MIN,MAX')
     parser.add_argument('--test-data-size', type=int, default=1000,
-        help='Number of samples used in the test data.')
+                        help='Number of samples used in the test data.')
     parser.add_argument('--output', type=str, default=None,
-        help='Optional output file where parameters will be saved after training.')
+                        help='Optional output file where parameters will be saved after training.')
     args = parser.parse_args()
 
     params = dynet.ParameterCollection()
@@ -157,6 +161,7 @@ def main():
         params.save(args.output)
         print('parameters saved to %s' % args.output)
     test(args, builder)
+
 
 if __name__ == '__main__':
     main()

@@ -1,7 +1,7 @@
 import dynet
 
-class ActivationFunction:
 
+class ActivationFunction:
     def __init__(self, function, glorot_gain):
         self.function = function
         self.glorot_gain = glorot_gain
@@ -9,23 +9,24 @@ class ActivationFunction:
     def __call__(self, arg):
         return self.function(arg)
 
+
 tanh = ActivationFunction(dynet.tanh, 1.0)
 relu = ActivationFunction(dynet.rectify, 0.5)
 sigmoid = ActivationFunction(dynet.logistic, 4.0)
 linear = ActivationFunction(lambda x: x, 1.0)
 
-class LayerInterface:
 
+class LayerInterface:
     def expression(self):
         raise NotImplementedError
 
-class LayerExpressionInterface:
 
+class LayerExpressionInterface:
     def __call__(self, arg):
         raise NotImplementedError
 
-class Layer(LayerInterface):
 
+class Layer(LayerInterface):
     def __init__(self, weights, bias, activation_function):
         self.weights = weights
         self.bias = bias
@@ -45,8 +46,8 @@ class Layer(LayerInterface):
     def output_size(self):
         return self.weights.shape()[0]
 
-class LayerExpression(LayerExpressionInterface):
 
+class LayerExpression(LayerExpressionInterface):
     def __init__(self, weights, bias, activation_function):
         self.weights = weights
         self.bias = bias
@@ -55,16 +56,16 @@ class LayerExpression(LayerExpressionInterface):
     def __call__(self, arg):
         return self.activation_function(dynet.affine_transform([self.bias, self.weights, arg]))
 
-class CompoundLayer(LayerInterface):
 
+class CompoundLayer(LayerInterface):
     def __init__(self, layers):
         self.layers = layers
 
     def expression(self):
         return CompoundLayerExpression([l.expression() for l in self.layers])
 
-class CompoundLayerExpression(LayerExpressionInterface):
 
+class CompoundLayerExpression(LayerExpressionInterface):
     def __init__(self, layers):
         self.layers = layers
 
@@ -74,8 +75,9 @@ class CompoundLayerExpression(LayerExpressionInterface):
             result = layer(result)
         return result
 
+
 def add_layer(params, input_size, output_size, activation_function,
-        weights_initializer=None, bias_initializer=None, name=None):
+              weights_initializer=None, bias_initializer=None, name=None):
     params = params.add_subcollection(name)
     if weights_initializer is None:
         weights_initializer = dynet.GlorotInitializer(
@@ -85,9 +87,10 @@ def add_layer(params, input_size, output_size, activation_function,
             False, activation_function.glorot_gain)
     return Layer(
         params.add_parameters((output_size, input_size), weights_initializer,
-            b'weights'),
-        params.add_parameters(output_size, bias_initializer, b'bias'),
+                              'weights'),
+        params.add_parameters(output_size, bias_initializer, 'bias'),
         activation_function)
+
 
 def combine_layers(layers):
     return CompoundLayer(layers)
